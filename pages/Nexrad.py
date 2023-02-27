@@ -34,7 +34,7 @@ data_files = os.listdir('data/')
 # db_path  = os.path.abspath(os.path.join(current_dir, "..", "Assignment_02"))
 
 if 'database.db' not in os.listdir(os.getcwd()):
-    FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetch_db"
+    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_db"
     response = requests.get(FASTAPI_URL, headers=headers)
     if response.status_code == 200:
         st.success("Successfully connected to the database")
@@ -51,7 +51,7 @@ with st.sidebar:
 st.title("Generate Link Nexrad")
 
 
-response = requests.get('http://35.229.73.233:8000/is_logged_in',headers=headers)
+response = requests.get('http://localhost:8000/is_logged_in',headers=headers)
 
 if response.status_code == 200:
 
@@ -64,7 +64,7 @@ if response.status_code == 200:
 
     # User selects the month
     if yearSelected != None:
-        FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetch_month"
+        FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_month"
         response = requests.get(FASTAPI_URL, json={"yearSelected": yearSelected},headers=headers)
         monthSelected = None
         if response.status_code == 200:
@@ -79,7 +79,7 @@ if response.status_code == 200:
 
         # User selects the day
         if monthSelected != None:
-            FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetch_day"
+            FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_day"
             response = requests.get(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected},headers=headers)
             daySelected = None
             if response.status_code == 200:
@@ -93,7 +93,7 @@ if response.status_code == 200:
 
             # User selects the station
             if daySelected != None:
-                FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetch_station"
+                FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_station"
                 response = requests.get(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected},headers=headers)
                 stationSelected = None
                 if response.status_code == 200:
@@ -109,7 +109,7 @@ if response.status_code == 200:
             # User selects the file
                 with st.spinner('Fetching Files...'):
                     if stationSelected != None:
-                        FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetch_file"
+                        FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_file"
                         response = requests.get(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected},headers=headers)
                         fileSelected = None
                         if response.status_code == 200:
@@ -124,7 +124,7 @@ if response.status_code == 200:
 
                 if st.button("Submit"):
                     with st.spinner('Generating Public S3 Link...'):
-                        FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetchurl"
+                        FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetchurl"
 
                         response = requests.post(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected, "file": fileSelected},headers=headers)
                         if response.status_code == 200:
@@ -151,16 +151,16 @@ if response.status_code == 200:
                             daySelected = '0' + daySelected
 
                         
-                        FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_fetch_key"
+                        FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_key"
                         response = requests.get(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected, "file": fileSelected},headers=headers)
                         if response.status_code == 200:
                             obj_key = response.json()['Key']
 
-                            FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_upload"
+                            FASTAPI_URL = "http://localhost:8000/nexrad_s3_upload"
                             response = requests.post(FASTAPI_URL, json={"key": obj_key, "source_bucket": 'noaa-nexrad-level2', "target_bucket": 'damg7245-team7'},headers=headers)
                             if response.status_code == 200:
                                 user_key = response.json()['Uploaded_Key']
-                                FASTAPI_URL = "http://35.229.73.233:8000/nexrad_s3_generate_user_link"
+                                FASTAPI_URL = "http://localhost:8000/nexrad_s3_generate_user_link"
 
                                 response = requests.post(FASTAPI_URL, json={"target_bucket": 'damg7245-team7', "user_key": user_key},headers=headers)
                                 if response.status_code == 200:

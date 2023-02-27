@@ -19,7 +19,7 @@ ACCESS_TOKEN = os.environ["access_token"]
 headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("NEXRAD Station Locations")
-response = requests.post('http://35.229.73.233:8000/retrieve_plot_data',headers=headers)
+response = requests.post('http://localhost:8000/retrieve_plot_data',headers=headers)
 
 if response.status_code == 200:
     df = pd.DataFrame(response.json()['df_dict'])

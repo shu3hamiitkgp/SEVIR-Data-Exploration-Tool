@@ -25,11 +25,11 @@ no_sidebar_style = """
 st.markdown(no_sidebar_style, unsafe_allow_html=True)
 
 def create_plot_table():
-    response = requests.post('http://35.229.73.233:8000/create_plot_table')
+    response = requests.post('http://localhost:8000/create_plot_table')
     return response
 
 def create_default_user():
-    response = requests.post('http://35.229.73.233:8000/create_default_user')
+    response = requests.post('http://localhost:8000/create_default_user')
     return response
 
 if __name__ == "__main__":

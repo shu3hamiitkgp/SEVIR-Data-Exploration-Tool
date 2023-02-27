@@ -21,7 +21,7 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("Generate NOAA-NEXRAD URL By Filename")
 
-response = requests.get('http://35.229.73.233:8000/is_logged_in',headers=headers)
+response = requests.get('http://localhost:8000/is_logged_in',headers=headers)
 
 if response.status_code == 200:
     file_name = st.text_input('Enter File Name')
@@ -29,7 +29,7 @@ if response.status_code == 200:
     if st.button('Get URL'):
         with st.spinner('Processing...'):
             if file_name:
-                FASTAPI_URL = "http://35.229.73.233:8000/nexrad_get_download_link"
+                FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
                 response = requests.post(FASTAPI_URL, json={"filename": file_name})
                 if response .status_code == 200:
                     res = response.json()['Response']

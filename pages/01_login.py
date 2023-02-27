@@ -34,7 +34,7 @@ with st.container():
                 "username": Username,
                 "password": Password
                 }
-                response = requests.post('http://35.229.73.233:8000/login',data=data)
+                response = requests.post('http://localhost:8000/login',data=data)
                 if int(response.json()['status_code']) == 200:
                     os.environ["access_token"] = response.json()['access_token']
                     # with open(".env", "a") as f:
