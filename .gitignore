@@ -6,5 +6,4 @@ backend/.env
 .vscode
 api_codes/__pycache__
 build
-dist
 team7_typer.egg-info
