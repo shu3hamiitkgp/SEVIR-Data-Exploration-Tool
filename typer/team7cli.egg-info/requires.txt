@@ -1,0 +1,6 @@
+bcrypt
+boto3
+pandas
+python-dotenv
+python-dotenv
+typer

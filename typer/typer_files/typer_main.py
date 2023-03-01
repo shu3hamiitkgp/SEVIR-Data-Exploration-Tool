@@ -1,5 +1,4 @@
 import requests
-import typer
 import boto3
 import os
 from dotenv import load_dotenv
@@ -8,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 import sys
 import bcrypt
+import typer
 
 
 
@@ -18,6 +18,7 @@ cwd = os.getcwd()
 project_dir = os.path.abspath(os.path.join(cwd, '..'))
 sys.path.insert(0, project_dir)
 os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
+
 
 from api_codes import nexrad_api
 from backend import nexrad_main
@@ -53,6 +54,12 @@ def create_connection():
 def createuser(user_name: str):
     """ 
     Create a user in the system
+
+    Args:
+        user_name (str): User name
+
+    Returns:
+        None
     """
 
 
@@ -84,7 +91,14 @@ def createuser(user_name: str):
 def fetchnexrad(user_name: str, password: str):
                
     """
-    List all files in an S3 bucket
+    Fecth nexrad data from S3 bucket
+
+    Args:
+        user_name (str): User name
+        password (str): Password
+
+    Returns:
+        None
     """
 
     s3client = create_connection()
@@ -104,6 +118,9 @@ def fetchnexrad(user_name: str, password: str):
 
     if bcrypt.checkpw(password.encode('utf-8'), stored_password):
         typer.echo("Password is correct")
+    else:
+        typer.echo("Password is incorrect")
+        return
 
         
     year = typer.prompt("Enter year from 2022 to 2023", type = str)
@@ -168,138 +185,9 @@ def fetchnexrad(user_name: str, password: str):
         url = response.json()
         typer.echo(url['Public S3 URL'])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    else:
+        typer.echo("Invalid filename or inputs")
+        return
 
 
 
@@ -307,12 +195,19 @@ def fetchnexrad(user_name: str, password: str):
 def fetch(user_name: str, bucket_name:str):
                
     """
-    List all files in an S3 bucket
+    List all files in an public S3 bucket
+
+    Args:
+        user_name (str): User name
+        bucket_name (str): S3 bucket name
+    
+    Returns:
+        None
     """
 
     s3client = create_connection()
 
-    connection = sqlite3.connect("users.db")
+    connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     users = pd.read_sql_query("SELECT * FROM users", connection)
     user_lst = users["user_name"].tolist()
@@ -329,15 +224,22 @@ def fetch(user_name: str, bucket_name:str):
     for obj in objects.get("Contents", []):
         typer.echo(obj.get("Key"))
 
-
 @app.command()
 def download(user_name: str, bucket_name: str = typer.Argument("damg7245-team7"), file_name: str = typer.Argument(...)):
     """
     Download a file from an S3 bucket
+
+    Args:
+        user_name (str): User name
+        bucket_name (str): S3 bucket name
+        file_name (str): File name  
+    
+    Returns:
+        None
     """
     s3client = create_connection()
 
-    connection = sqlite3.connect("users.db")
+    connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     users = pd.read_sql_query("SELECT * FROM users", connection)
     user_lst = users["user_name"].tolist()
@@ -356,6 +258,47 @@ def download(user_name: str, bucket_name: str = typer.Argument("damg7245-team7")
     # Download the file
     typer.echo(f"Downloading file '{file_name}' from S3 bucket '{bucket_name}'...")
     s3client.download_file(bucket_name, file_name, file_name)
+
+@app.command()
+def fetchnexrad_filename (user_name: str, password: str):
+
+    s3client = create_connection()
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    users = pd.read_sql_query("SELECT * FROM users", connection)
+    user_lst = users["user_name"].tolist()
+
+    if user_name not in user_lst:
+        typer.echo(f"User {user_name} does not exist")
+        return
+
+    stored_password = pd.read_sql("SELECT password FROM users WHERE user_name =" + "'" + user_name + "'", connection)
+    stored_password = stored_password["password"].tolist()
+    stored_password = stored_password[0]
+
+    if bcrypt.checkpw(password.encode('utf-8'), stored_password):
+        typer.echo("Password is correct")
+    else:
+        typer.echo("Password is incorrect")
+        return
+    
+    file_name = typer.prompt("Enter file name")
+    FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
+    response = requests.post(FASTAPI_URL, json={"filename": file_name})
+
+    if response.status_code == 200:
+        url = response.json()
+        typer.echo(url['Response'])
+
+    else:
+        typer.echo("File does not exist or invalid file name")
+
+
+
+    
+
+
 
 
 if __name__ == "__main__":

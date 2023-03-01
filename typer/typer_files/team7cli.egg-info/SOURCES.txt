@@ -1,0 +1,8 @@
+setup.py
+typer_main.py
+team7cli.egg-info/PKG-INFO
+team7cli.egg-info/SOURCES.txt
+team7cli.egg-info/dependency_links.txt
+team7cli.egg-info/entry_points.txt
+team7cli.egg-info/requires.txt
+team7cli.egg-info/top_level.txt
