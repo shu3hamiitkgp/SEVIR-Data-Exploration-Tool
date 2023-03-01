@@ -10,7 +10,6 @@ import bcrypt
 import typer
 
 
-
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
 

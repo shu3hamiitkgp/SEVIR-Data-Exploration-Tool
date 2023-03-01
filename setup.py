@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='team7cli',
+    name='team7_typer',
     version='0.1.0',
         packages=find_packages(),
     include_package_data=True,
@@ -18,8 +18,9 @@ setup(
         'bcrypt'
 
                 ],
-    entry_points='''
-        [console_scripts]
-        team7cli=typer_main:app
-    '''
+entry_points={
+    'console_scripts': [
+        'typer_app=team7_typer.typer_main:app',
+    ],
+}
 )

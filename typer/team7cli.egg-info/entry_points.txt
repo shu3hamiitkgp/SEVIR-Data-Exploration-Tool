@@ -1,4 +1,0 @@
-
-        [console_scripts]
-        team7cli=typer_main:app
-    

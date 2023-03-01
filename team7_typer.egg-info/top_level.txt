@@ -1,0 +1,6 @@
+api_codes
+backend
+data
+pages
+team7_typer
+typer_main

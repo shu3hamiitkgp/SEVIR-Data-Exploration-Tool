@@ -5,3 +5,5 @@ venv_a2
 backend/.env
 .vscode
 api_codes/__pycache__
+build
+dist
