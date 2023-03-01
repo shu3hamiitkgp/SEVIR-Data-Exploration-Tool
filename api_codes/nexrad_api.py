@@ -127,6 +127,8 @@ async def nexrad_s3_fetch_day(nexrad_s3_fetch_day: Nexrad_S3_fetch_day):
     
     nexrad_main.write_logs("Status: 200, Message: Day list generated for the month " + nexrad_s3_fetch_day.month + " of the year " + nexrad_s3_fetch_day.year)
 
+    print(nexrad_s3_fetch_day.year, nexrad_s3_fetch_day.month)
+
     return {"Day": nexrad_main.get_distinct_day(nexrad_s3_fetch_day.year, nexrad_s3_fetch_day.month)}
 
 @app.get('/nexrad_s3_fetch_station')
@@ -170,6 +172,7 @@ async def nexrad_s3_fetch_file(nexrad_s3_fetch_file: Nexrad_S3_fetch_file):
         
     Returns:
         list: Returns the list of files"""
+    
 
 
     if not re.match(r"^[A-Z0-9]{4}$", nexrad_s3_fetch_file.station):

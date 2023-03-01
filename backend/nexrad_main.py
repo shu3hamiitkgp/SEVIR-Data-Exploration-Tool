@@ -21,11 +21,16 @@ cwd = os.getcwd()
 load_dotenv()
 
 # Navigate to the project directory
-project_dir = os.path.abspath(os.path.join(cwd, ''))
-sys.path.insert(0, project_dir)
-os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
+# project_dir = os.path.abspath(os.path.join(cwd, ''))
+# sys.path.insert(0, project_dir)
+# os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
 
-database_path = os.path.join(project_dir, 'data' , 'database.db')
+
+# # Path to the database
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+database_path = os.path.join(project_dir,  'database.db')
+
+
 
 
 
@@ -89,7 +94,8 @@ def get_distinct_month(yearSelected):
         month (list): The list of months
     """
 
-    connection = sqlite3.connect('database.db')
+
+    connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     month = pd.read_sql_query("SELECT DISTINCT Month FROM nexrad_" + yearSelected, connection)
     month = month['Month'].tolist()
@@ -108,8 +114,7 @@ def get_distinct_day(yearSelected, monthSelected):
         day (list): The list of days
     """
     
-    connection = sqlite3.connect('database.db')
-
+    connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     day = pd.read_sql_query("SELECT DISTINCT Day FROM nexrad_" + yearSelected + " WHERE year = " + yearSelected + " AND Month = " + monthSelected, connection)
     day = day['Day'].tolist()
@@ -129,7 +134,7 @@ def get_distinct_station(yearSelected, monthSelected, daySelected):
         station (list): The list of stations
     """
         
-    connection = sqlite3.connect('database.db')
+    connection = sqlite3.connect(database_path)
 
     cursor = connection.cursor()
     station = pd.read_sql_query("SELECT DISTINCT Station FROM nexrad_" + yearSelected + " where year = " + yearSelected + " and month = " + monthSelected + " and day = " + daySelected, connection)
