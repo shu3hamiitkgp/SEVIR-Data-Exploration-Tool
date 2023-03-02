@@ -7,3 +7,4 @@ backend/.env
 api_codes/__pycache__
 build
 team7_typer.egg-info
+backend/__pycache__
