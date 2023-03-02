@@ -17,3 +17,5 @@ backend/__pycache__
 
 backend/__pycache__/__init__.cpython-310.pyc
 
+pages/__pycache__
+pages/__pycache__/Nexrad.cpython-310.pyc

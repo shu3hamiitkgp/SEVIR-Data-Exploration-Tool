@@ -36,4 +36,4 @@ if response.status_code==200:
     else:
         st.error('Either you have not logged in or else your session has expired.', icon="🚨")
 else:
-    st.error('Either you have not logged in or else you have exceeded the api limit.', icon="🚨")
+    st.error('Looks like your limit has exceeded!', icon="🚨")
