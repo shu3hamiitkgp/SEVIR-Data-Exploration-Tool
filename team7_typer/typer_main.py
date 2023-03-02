@@ -1,3 +1,5 @@
+import datetime as dt
+from fastapi import Response, status
 import requests
 import boto3
 import os
@@ -23,11 +25,17 @@ from api_codes import nexrad_api
 from backend import nexrad_main
 
 
-database_path = os.path.join(project_dir, 'data/assignment_03.db')
+database_path = os.path.join(project_dir, os.path.join('data', 'assignment_03.db'))
 app = typer.Typer()
 
 
 def create_db():
+
+    """
+    Create a table users in the database
+
+
+    """
      
     db = sqlite3.connect(database_path)
     cursor = db.cursor()
@@ -35,13 +43,74 @@ def create_db():
     db.commit()
     db.close()
 
-
 def insert_user(username, password, plan, api_limit):
+
+    """
+    Insert a user into the database
+
+    Args:
+        username (str): User name
+        password (str): Password
+        plan (int): User plan
+        api_limit (int): API limit
+    
+    Returns:
+        None
+    """
+
     db = sqlite3.connect(database_path)
     cursor = db.cursor()
-    cursor.execute('''INSERT INTO Users VALUES (?,?,?,?)''', (username, password, plan, api_limit))
+    cursor.execute('''CREATE TABLE if not exists Users (username,hashed_password, plan, api_limit)''')
+    cursor.execute('INSERT INTO Users VALUES (?,?,?,?)', (username, password, plan, api_limit))
     db.commit()
     db.close()
+
+
+
+def user_status(username:str, api_name: str):
+    """
+    Check the user status if they have exceeded the api limit
+
+    Args:
+        username (str): User name
+        api_name (str): API name
+
+    Returns:
+        None
+    """
+
+    db = sqlite3.connect(database_path)
+    cursor = db.cursor()
+    cursor.execute('''CREATE TABLE if not exists user_activity (username,api_limit,date,api_name,hit_count)''')
+    cursor.execute('SELECT * FROM user_activity WHERE username =? ORDER BY date DESC LIMIT 1',(username,))
+    result = cursor.fetchone()
+    api_limit=pd.read_sql_query('Select api_limit from Users where username="{}"'.format(username),db).api_limit.item()
+    date = dt.datetime.utcnow()
+    if not result:
+        hit_count = 1
+        cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
+        db.commit()
+    else:
+        last_date = dt.datetime.strptime(result[2], '%Y-%m-%d %H:%M:%S.%f')
+        time_diff = dt.datetime.utcnow() - last_date
+        # time_diff = time_diff + dt.timedelta(hours=1)
+        if time_diff <= dt.timedelta(hours=1):
+            if result[4]<api_limit:
+                hit_count = result[4] + 1
+                cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
+                db.commit()
+            else:
+                db.commit()
+                db.close() 
+                return "Too many requests wait for 1 hour"
+        else:
+            hit_count = 1
+            cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
+            db.commit()
+            # db.close()
+
+
+
 
 
 
@@ -157,7 +226,11 @@ def fetchnexrad(username: str, password: str):
         typer.echo("Password is incorrect")
         return
     
-
+    response = user_status(username, "fetchnexrad")
+    if response == "Too many requests wait for 1 hour":
+        typer.echo(response)
+        return
+    
         
     year = typer.prompt("Enter year from 2022 to 2023", type = str)
     if year not in ['2022', '2023']:
@@ -252,6 +325,13 @@ def fetch(username: str, bucket_name:str):
         typer.echo(f"User {username} does not exist")
         return
     
+    response = user_status(username, "fetch")
+    if response == "Too many requests wait for 1 hour":
+
+        typer.echo("Too many requests wait for 1 hour")
+        return
+    
+    
     
 
     typer.confirm(f"Are you sure you want to list files in S3 bucket?", abort=True)
@@ -287,6 +367,10 @@ def download(username: str, bucket_name: str = typer.Argument("damg7245-team7"),
         typer.echo(f"User {username} does not exist")
         return
     
+    response = user_status(username, "download")
+    if response == "Too many requests wait for 1 hour":
+        typer.echo(response)
+        return
 
     # Check if the file exists in the bucket
     objects = s3client.list_objects_v2(Bucket=bucket_name)
@@ -302,6 +386,17 @@ def download(username: str, bucket_name: str = typer.Argument("damg7245-team7"),
 
 @app.command()
 def fetchnexrad_filename (username: str, password: str):
+
+    """
+    Fetch Nexrad filename from the NOAA website
+
+    Args:
+        username (str): User name
+        password (str): Password
+    
+    Returns:
+        None
+    """
 
     s3client = create_connection()
 
@@ -323,6 +418,12 @@ def fetchnexrad_filename (username: str, password: str):
     else:
         typer.echo("Password is incorrect")
         return
+
+    response = user_status(username, "fetchnexrad_filename")
+    if response == "Too many requests wait for 1 hour":
+        typer.echo(response)
+        return
+    
     
     
     file_name = typer.prompt("Enter file name")
@@ -337,9 +438,6 @@ def fetchnexrad_filename (username: str, password: str):
         typer.echo("File does not exist or invalid file name")
 
 
-
-
-    
 
 
 
