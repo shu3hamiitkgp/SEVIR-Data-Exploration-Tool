@@ -4,6 +4,7 @@ api_codes/__init__.py
 api_codes/goes_api.py
 api_codes/login.py
 api_codes/nexrad_api.py
+api_codes/s3_api.py
 backend/__init__.py
 backend/access_token.py
 backend/goes_file_retrieval_main.py
