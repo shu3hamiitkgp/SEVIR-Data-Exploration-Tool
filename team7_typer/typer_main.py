@@ -226,7 +226,7 @@ def fetchnexrad(username: str, password: str):
         typer.echo("Password is incorrect")
         return
     
-    response = user_status(username, "fetchnexrad")
+    response = user_status(username, "nexrad_s3_fetchurl")
     if response == "Too many requests wait for 1 hour":
         typer.echo(response)
         return
@@ -419,7 +419,7 @@ def fetchnexrad_filename (username: str, password: str):
         typer.echo("Password is incorrect")
         return
 
-    response = user_status(username, "fetchnexrad_filename")
+    response = user_status(username, "nexrad_get_download_link")
     if response == "Too many requests wait for 1 hour":
         typer.echo(response)
         return
