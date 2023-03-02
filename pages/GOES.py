@@ -34,7 +34,7 @@ if 'database.db' not in os.listdir(os.getcwd()):
     else:
         st.error("Failed to connect to the database")
 
-st.title("Generate Link Nexrad")
+# st.title("Generate Link Nexrad")
 
 FASTAPI_url='http://localhost:8000/goes_station'
 response=requests.get(FASTAPI_url,headers=headers)
@@ -76,31 +76,36 @@ if response.status_code == 200:
                     st.error('Either you have not logged in or else your session has expired.', icon="🚨")
 
                 if st.button('Submit'):
-
-                    FASTAPI_url='http://localhost:8000/goes_fetch_url'
-                    input={'station':station_box,'year':year_box,'day':day_box,'hour':hour_box,'file':file_box}
+                    FASTAPI_url='http://localhost:8000/user_api_status'
+                    input={'api_name':'goes_feature'}
                     response=requests.post(FASTAPI_url,json=input,headers=headers)
                     if response.status_code==200:
-                        goes_url=response.json()
-                        goes_url=goes_url['NOAAURL']
-                        st.markdown("**Generated URL**")
-                        st.write(goes_url)
-                        FASTAPI_url='http://localhost:8000/goes_AWS_url'
+                        FASTAPI_url='http://localhost:8000/goes_fetch_url'
                         input={'station':station_box,'year':year_box,'day':day_box,'hour':hour_box,'file':file_box}
                         response=requests.post(FASTAPI_url,json=input,headers=headers)
                         if response.status_code==200:
-                            aws_url=response.json()
-                            aws_url=aws_url['S3URL']
-                            st.markdown("**AWS S3 URL**")
-                            st.write(aws_url)
+                            goes_url=response.json()
+                            goes_url=goes_url['NOAAURL']
+                            st.markdown("**Generated URL**")
+                            st.write(goes_url)
+                            FASTAPI_url='http://localhost:8000/goes_AWS_url'
+                            input={'station':station_box,'year':year_box,'day':day_box,'hour':hour_box,'file':file_box}
+                            response=requests.post(FASTAPI_url,json=input,headers=headers)
+                            if response.status_code==200:
+                                aws_url=response.json()
+                                aws_url=aws_url['S3URL']
+                                st.markdown("**AWS S3 URL**")
+                                st.write(aws_url)
+                            elif response.status_code == 401:
+                                st.error('Either you have not logged in or else your session has expired.', icon="🚨")
+                            else:
+                                st.markdown("**Error generating AWS S3 URL**")
                         elif response.status_code == 401:
                             st.error('Either you have not logged in or else your session has expired.', icon="🚨")
                         else:
-                            st.markdown("**Error generating AWS S3 URL**")
-                    elif response.status_code == 401:
-                        st.error('Either you have not logged in or else your session has expired.', icon="🚨")
+                            st.markdown("**Error generating NOAA GOES URL**")
                     else:
-                        st.markdown("**Error generating NOAA GOES URL**")
+                        st.error('Either you have not logged in or else your session has expired.', icon="🚨")
             else:
                 st.error('Either you have not logged in or else your session has expired.', icon="🚨")
         else:

@@ -74,3 +74,7 @@ class TokenClass(BaseModel):
 
 class TokenData(BaseModel):
     username: Union[str, None] = None
+    
+    
+class api_detail_fetch(BaseModel):
+    api_name:str

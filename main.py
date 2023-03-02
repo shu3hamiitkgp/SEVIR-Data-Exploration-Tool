@@ -13,6 +13,7 @@ import boto3
 import logging
 import time
 import sys
+from datetime import datetime,timedelta
 cwd = os.getcwd()
 project_dir = os.path.abspath(os.path.join(cwd, '..'))
 sys.path.insert(0, project_dir)
@@ -718,12 +719,14 @@ async def create_default_user():
     database_file_path = os.path.join('data/',database_file_name)
     db = sqlite3.connect(database_file_path)
     cursor = db.cursor()
-    cursor.execute('''CREATE TABLE if not exists Users (id,username,hashed_password)''')
+    cursor.execute('''CREATE TABLE if not exists Users (username,hashed_password,service_plan,api_limit)''')
     user= pd.read_sql_query("SELECT * FROM Users", db)
     if len(user) == 0:
         pwd_cxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
         hashed_password = pwd_cxt.hash(("spring2023"))
-        cursor.execute("Insert into Users values (?,?,?)", (1,"damg7245",hashed_password))
+        cursor.execute("Insert into Users values (?,?,?,?)", ("user1",hashed_password,"Free",10))
+        cursor.execute("Insert into Users values (?,?,?,?)", ("user2",hashed_password,"Gold",15))
+        cursor.execute("Insert into Users values (?,?,?,?)", ("user3",hashed_password,"Platinum",20))
         db.commit()
         db.close()
     return {'status_code': '200'}
@@ -737,3 +740,54 @@ async def retrieve_plot_data(getCurrentUser: schema.TokenData = Depends(oauth2.g
     df_dict = df.to_dict(orient='records')
     db.close()
     return {'df_dict':df_dict, 'status_code': '200'}
+
+@app.post('/update_login')
+async def login_update(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join('data/',database_file_name)
+    db = sqlite3.connect(database_file_path)
+    cursor = db.cursor()
+    cursor.execute('''CREATE TABLE if not exists Logins (username,logindate)''')
+    cursor.execute("Insert into Logins values (?,?)", (getCurrentUser.username,datetime.utcnow()))
+    db.commit()
+    db.close()
+    return {'status_code': '200'}
+
+@app.post('/user_api_status')
+async def get_user_data(api_details: schema.api_detail_fetch,getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join('data/',database_file_name)
+    db = sqlite3.connect(database_file_path)
+    cursor = db.cursor()
+    cursor.execute('''CREATE TABLE if not exists user_activity (username,api_limit,date,api_name,hit_count)''')
+    cursor.execute('SELECT * FROM user_activity WHERE username =? ORDER BY date DESC LIMIT 1',(getCurrentUser.username,))
+    result = cursor.fetchone()
+    username=getCurrentUser.username
+    api_limit=pd.read_sql_query('Select api_limit from Users where username="{}"'.format(username),db).api_limit.item()
+    date = datetime.utcnow()
+    api_name=api_details.api_name 
+    if not result:
+        hit_count = 1
+        cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
+        db.commit()
+    else:
+        last_date = datetime.strptime(result[2], '%Y-%m-%d %H:%M:%S.%f')
+        time_diff = datetime.utcnow() - last_date
+        if time_diff <= timedelta(hours=1):
+            if result[4]<api_limit:
+                hit_count = result[4] + 1
+                cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
+                db.commit()
+            else:
+                db.commit()
+                db.close() 
+                return Response(status_code=status.HTTP_429_TOO_MANY_REQUESTS)
+        else:
+            hit_count = 1
+            cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
+            db.commit()
+
+    
+    
+        
+
