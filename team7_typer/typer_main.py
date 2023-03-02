@@ -414,7 +414,6 @@ def download(username: str, password:str, bucket_name: str = typer.Argument("dam
 
 
 
-
 @app.command()
 def fetchnexrad_filename (username: str, password: str):
 

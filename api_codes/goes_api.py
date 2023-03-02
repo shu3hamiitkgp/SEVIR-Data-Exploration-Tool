@@ -14,11 +14,14 @@ from pydantic import BaseModel
 import pandas as pd
 import re
 
+
+
 goes_database_file_name = 'goes18.db'
 goes_database_file_path = os.path.join('data/',goes_database_file_name)
 
 
 app = FastAPI()
+
 
 class goes_year(BaseModel):
     
