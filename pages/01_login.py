@@ -3,6 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import webbrowser
 
 load_dotenv()
 
@@ -71,3 +72,6 @@ with st.container():
                     st.error('Username not found in the database')
                 else:
                     st.error('Password is incorrect')
+
+if st.button("Signup"):
+     webbrowser.open("http://localhost:8501/User_Signup")
