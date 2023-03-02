@@ -1,6 +1,7 @@
 .env
 __pycache__
 
+<<<<<<< HEAD
 venv_a2
 backend/.env
 .vscode
@@ -8,3 +9,11 @@ api_codes/__pycache__
 build
 team7_typer.egg-info
 backend/__pycache__
+
+venv_a3
+backend/.env
+pages/__pycache__
+backend/__pycache__
+
+backend/__pycache__/__init__.cpython-310.pyc
+

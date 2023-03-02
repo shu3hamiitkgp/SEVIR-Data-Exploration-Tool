@@ -23,9 +23,25 @@ from api_codes import nexrad_api
 from backend import nexrad_main
 
 
-database_path = os.path.join(project_dir, 'database.db')
+database_path = os.path.join(project_dir, 'data/assignment_03.db')
 app = typer.Typer()
 
+
+def create_db():
+     
+    db = sqlite3.connect(database_path)
+    cursor = db.cursor()
+    cursor.execute('''CREATE TABLE if not exists Users (username,hashed_password, plan, api_limit)''')
+    db.commit()
+    db.close()
+
+
+def insert_user(username, password, plan, api_limit):
+    db = sqlite3.connect(database_path)
+    cursor = db.cursor()
+    cursor.execute('''INSERT INTO Users VALUES (?,?,?,?)''', (username, password, plan, api_limit))
+    db.commit()
+    db.close()
 
 
 
@@ -50,12 +66,12 @@ def create_connection():
 
 
 @app.command()
-def createuser(user_name: str):
+def createuser(username: str):
     """ 
     Create a user in the system
 
     Args:
-        user_name (str): User name
+        username (str): User name
 
     Returns:
         None
@@ -80,20 +96,40 @@ def createuser(user_name: str):
             return
         
         password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        connection = sqlite3.connect(database_path)
+        cursor = connection.cursor()
+        create_db()
+        users = pd.read_sql_query("SELECT * FROM Users", connection)
+        user_lst = users["username"].tolist()
+
+        if username in user_lst:
+            typer.echo(f"User {username} already exists")
+            return
+        
+        else:
+            if user_tier == 1:
+                api_limit = 10
+
+            if user_tier == 2:
+                api_limit = 15
+            
+            if user_tier == 3:
+                api_limit = 20
     
-        df = pd.DataFrame({"user_name": [user_name], "password": [password], "tier": [user_tier]})
-        df.to_sql("users", con=sqlite3.connect(database_path), if_exists="append", index=False)
-        typer.echo(f"User {user_name} created successfully")
+            insert_user(username, password, user_tier, api_limit)
+            typer.echo(f"User {username} created successfully")
+
 
 
 @app.command()
-def fetchnexrad(user_name: str, password: str):
+def fetchnexrad(username: str, password: str):
                
     """
     Fecth nexrad data from S3 bucket
 
     Args:
-        user_name (str): User name
+        username (str): User name
         password (str): Password
 
     Returns:
@@ -104,14 +140,14 @@ def fetchnexrad(user_name: str, password: str):
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-    users = pd.read_sql_query("SELECT * FROM users", connection)
-    user_lst = users["user_name"].tolist()
+    users = pd.read_sql_query("SELECT * FROM Users", connection)
+    user_lst = users["username"].tolist()
 
-    if user_name not in user_lst:
-        typer.echo(f"User {user_name} does not exist")
+    if username not in user_lst:
+        typer.echo(f"User {username} does not exist")
         return
 
-    stored_password = pd.read_sql("SELECT password FROM users WHERE user_name =" + "'" + user_name + "'", connection)
+    stored_password = pd.read_sql("SELECT password FROM users WHERE username =" + "'" + username + "'", connection)
     stored_password = stored_password["password"].tolist()
     stored_password = stored_password[0]
 
@@ -120,6 +156,7 @@ def fetchnexrad(user_name: str, password: str):
     else:
         typer.echo("Password is incorrect")
         return
+    
 
         
     year = typer.prompt("Enter year from 2022 to 2023", type = str)
@@ -191,13 +228,13 @@ def fetchnexrad(user_name: str, password: str):
 
 
 @app.command()
-def fetch(user_name: str, bucket_name:str):
+def fetch(username: str, bucket_name:str):
                
     """
     List all files in an public S3 bucket
 
     Args:
-        user_name (str): User name
+        username (str): User name
         bucket_name (str): S3 bucket name
     
     Returns:
@@ -208,12 +245,13 @@ def fetch(user_name: str, bucket_name:str):
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-    users = pd.read_sql_query("SELECT * FROM users", connection)
-    user_lst = users["user_name"].tolist()
+    users = pd.read_sql_query("SELECT * FROM Users", connection)
+    user_lst = users["username"].tolist()
 
-    if user_name not in user_lst:
-        typer.echo(f"User {user_name} does not exist")
+    if username not in user_lst:
+        typer.echo(f"User {username} does not exist")
         return
+    
     
 
     typer.confirm(f"Are you sure you want to list files in S3 bucket?", abort=True)
@@ -223,13 +261,15 @@ def fetch(user_name: str, bucket_name:str):
     for obj in objects.get("Contents", []):
         typer.echo(obj.get("Key"))
 
+
+
 @app.command()
-def download(user_name: str, bucket_name: str = typer.Argument("damg7245-team7"), file_name: str = typer.Argument(...)):
+def download(username: str, bucket_name: str = typer.Argument("damg7245-team7"), file_name: str = typer.Argument(...)):
     """
     Download a file from an S3 bucket
 
     Args:
-        user_name (str): User name
+        username (str): User name
         bucket_name (str): S3 bucket name
         file_name (str): File name  
     
@@ -240,11 +280,11 @@ def download(user_name: str, bucket_name: str = typer.Argument("damg7245-team7")
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-    users = pd.read_sql_query("SELECT * FROM users", connection)
-    user_lst = users["user_name"].tolist()
+    users = pd.read_sql_query("SELECT * FROM Users", connection)
+    user_lst = users["username"].tolist()
 
-    if user_name not in user_lst:
-        typer.echo(f"User {user_name} does not exist")
+    if username not in user_lst:
+        typer.echo(f"User {username} does not exist")
         return
     
 
@@ -258,21 +298,23 @@ def download(user_name: str, bucket_name: str = typer.Argument("damg7245-team7")
     typer.echo(f"Downloading file '{file_name}' from S3 bucket '{bucket_name}'...")
     s3client.download_file(bucket_name, file_name, file_name)
 
+
+
 @app.command()
-def fetchnexrad_filename (user_name: str, password: str):
+def fetchnexrad_filename (username: str, password: str):
 
     s3client = create_connection()
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-    users = pd.read_sql_query("SELECT * FROM users", connection)
-    user_lst = users["user_name"].tolist()
+    users = pd.read_sql_query("SELECT * FROM Users", connection)
+    user_lst = users["username"].tolist()
 
-    if user_name not in user_lst:
-        typer.echo(f"User {user_name} does not exist")
+    if username not in user_lst:
+        typer.echo(f"User {username} does not exist")
         return
 
-    stored_password = pd.read_sql("SELECT password FROM users WHERE user_name =" + "'" + user_name + "'", connection)
+    stored_password = pd.read_sql("SELECT password FROM users WHERE username =" + "'" + username + "'", connection)
     stored_password = stored_password["password"].tolist()
     stored_password = stored_password[0]
 
@@ -281,6 +323,7 @@ def fetchnexrad_filename (user_name: str, password: str):
     else:
         typer.echo("Password is incorrect")
         return
+    
     
     file_name = typer.prompt("Enter file name")
     FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
@@ -292,6 +335,7 @@ def fetchnexrad_filename (user_name: str, password: str):
 
     else:
         typer.echo("File does not exist or invalid file name")
+
 
 
 

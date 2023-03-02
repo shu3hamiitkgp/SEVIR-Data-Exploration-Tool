@@ -123,56 +123,61 @@ if response.status_code == 200:
 
 
                 if st.button("Submit"):
-                    with st.spinner('Generating Public S3 Link...'):
-                        FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetchurl"
+                    FASTAPI_URL='http://localhost:8000/user_api_status'
+                    input={'api_name':'nexrad_feature'}
+                    response=requests.post(FASTAPI_URL,json=input,headers=headers)
+                    
+                    if response.status_code==200:
+                        with st.spinner('Generating Public S3 Link...'):
+                            FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetchurl"
 
-                        response = requests.post(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected, "file": fileSelected},headers=headers)
-                        if response.status_code == 200:
-                            generated_url = response.json()
-                            st.success("Successfully generated Public S3 link")
-                            st.markdown("**Public URL**")
-
-                            st.write(generated_url['Public S3 URL'])
-                        elif response.status_code == 401:
-                            st.error('Either you have not logged in or else your session has expired.', icon="🚨")
-                        else:
-                            st.error("Error in generating Public S3 link")
-                            st.write(response.json())
-
-                    with st.spinner('Generating Custom Link...'):
-
-                        monthSelected = str(monthSelected)
-                        daySelected = str(daySelected)
-                        stationSelected = str(stationSelected)
-
-                        if len(monthSelected) == 1:
-                            monthSelected = '0' + monthSelected
-                        if len(daySelected) == 1:
-                            daySelected = '0' + daySelected
-
-                        
-                        FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_key"
-                        response = requests.get(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected, "file": fileSelected},headers=headers)
-                        if response.status_code == 200:
-                            obj_key = response.json()['Key']
-
-                            FASTAPI_URL = "http://localhost:8000/nexrad_s3_upload"
-                            response = requests.post(FASTAPI_URL, json={"key": obj_key, "source_bucket": 'noaa-nexrad-level2', "target_bucket": 'damg7245-team7'},headers=headers)
+                            response = requests.post(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected, "file": fileSelected},headers=headers)
                             if response.status_code == 200:
-                                user_key = response.json()['Uploaded_Key']
-                                FASTAPI_URL = "http://localhost:8000/nexrad_s3_generate_user_link"
+                                generated_url = response.json()
+                                st.success("Successfully generated Public S3 link")
+                                st.markdown("**Public URL**")
 
-                                response = requests.post(FASTAPI_URL, json={"target_bucket": 'damg7245-team7', "user_key": user_key},headers=headers)
+                                st.write(generated_url['Public S3 URL'])
+                            elif response.status_code == 401:
+                                st.error('Either you have not logged in or else your session has expired.', icon="🚨")
+                            else:
+                                st.error("Error in generating Public S3 link")
+                                st.write(response.json())
+
+                        with st.spinner('Generating Custom Link...'):
+
+                            monthSelected = str(monthSelected)
+                            daySelected = str(daySelected)
+                            stationSelected = str(stationSelected)
+
+                            if len(monthSelected) == 1:
+                                monthSelected = '0' + monthSelected
+                            if len(daySelected) == 1:
+                                daySelected = '0' + daySelected
+
+                            
+                            FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_key"
+                            response = requests.get(FASTAPI_URL, json={"year": yearSelected, "month": monthSelected, "day": daySelected, "station": stationSelected, "file": fileSelected},headers=headers)
+                            if response.status_code == 200:
+                                obj_key = response.json()['Key']
+
+                                FASTAPI_URL = "http://localhost:8000/nexrad_s3_upload"
+                                response = requests.post(FASTAPI_URL, json={"key": obj_key, "source_bucket": 'noaa-nexrad-level2', "target_bucket": 'damg7245-team7'},headers=headers)
                                 if response.status_code == 200:
-                                    user_url = response.json()['User S3 URL']
-                                    st.success("Successfully uploaded to User S3 Bucket")
-                                    st.markdown("**AWS S3 URL**")
-                                    st.write(user_url)
+                                    user_key = response.json()['Uploaded_Key']
+                                    FASTAPI_URL = "http://localhost:8000/nexrad_s3_generate_user_link"
+
+                                    response = requests.post(FASTAPI_URL, json={"target_bucket": 'damg7245-team7', "user_key": user_key},headers=headers)
+                                    if response.status_code == 200:
+                                        user_url = response.json()['User S3 URL']
+                                        st.success("Successfully uploaded to User S3 Bucket")
+                                        st.markdown("**AWS S3 URL**")
+                                        st.write(user_url)
+                                    else:
+                                        st.error('Either you have not logged in or else your session has expired.', icon="🚨")
                                 else:
                                     st.error('Either you have not logged in or else your session has expired.', icon="🚨")
                             else:
                                 st.error('Either you have not logged in or else your session has expired.', icon="🚨")
-                        else:
-                            st.error('Either you have not logged in or else your session has expired.', icon="🚨")
 else:
     st.error('Either you have not logged in or else your session has expired.', icon="🚨")
