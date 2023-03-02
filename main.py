@@ -30,6 +30,7 @@ sys.path.append('../Assignment_02')
 # os.environ.get('PYTHONPATH', '')
 # os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
 from backend import main_goes18, goes_file_retrieval_main
+from backend import main_goes18, goes_file_retrieval_main, nexrad_file_retrieval_main
 from pydantic import BaseModel
 import random
 import string
@@ -787,7 +788,32 @@ async def get_user_data(api_details: schema.api_detail_fetch,getCurrentUser: sch
             cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?)', (username,api_limit,date,api_name,hit_count))
             db.commit()
 
-    
-    
-        
+@app.post('/nexrad_get_download_link')
+async def nexrad_download_link(nexrad_filename: schema.Nexrad_fetch_filename):
 
+    """Generates the link for the file in the nexrad S3 bucket
+    
+    Args:
+        filename (str): filename entered by the user
+        
+    Returns:
+        str: Returns the response from backend function get_nexrad_file_url"""
+    
+    nexrad_file_retrieval_main.write_logs("NEXRAD_File_Link_Retrieval: API Request Initiated")
+    
+    response = nexrad_file_retrieval_main.get_nexrad_file_url(nexrad_filename.filename)
+    return {"Response": response}
+
+@app.post("/signup")
+async def signup(user_data: schema.User):
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join('data/',database_file_name)
+    db = sqlite3.connect(database_file_path)
+    cursor = db.cursor()
+    pwd_cxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    hashed_password = pwd_cxt.hash((user_data.password))
+    cursor.execute("Insert into Users values (?,?,?,?)",
+                   (user_data.username, hashed_password, user_data.service_plan, user_data.api_limit))
+    db.commit()
+    db.close()
+    return {'status_code': '200'}    

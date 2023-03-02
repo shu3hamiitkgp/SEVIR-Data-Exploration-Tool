@@ -78,3 +78,12 @@ class TokenData(BaseModel):
     
 class api_detail_fetch(BaseModel):
     api_name:str
+
+class Nexrad_fetch_filename(BaseModel):
+    filename: str
+
+class User(BaseModel):
+    username: str
+    password: str
+    service_plan: str
+    api_limit: int

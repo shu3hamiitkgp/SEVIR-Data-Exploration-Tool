@@ -153,3 +153,4 @@ wrapt==1.14.1
 WTForms==3.0.1
 yarl==1.8.2
 zipp==3.12.1
+bcrypt==4.0.1
