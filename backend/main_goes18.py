@@ -164,6 +164,7 @@ def grab_station():
     cursor = conn.cursor()
     stations= pd.read_sql_query('SELECT distinct station FROM goes18_metadata', conn)
     stations_list=stations.Station.tolist()
+    stations_list.insert(0, None)
     conn.close()
     
     return stations_list
@@ -180,9 +181,9 @@ def grab_years(station):
     
     conn=db_connection()
     cursor = conn.cursor()
-    years= pd.read_sql_query('SELECT distinct "year" FROM goes18_metadata where station="{}"'.format(station), conn)
+    years= pd.read_sql_query('SELECT distinct year FROM goes18_metadata where station="{}"'.format(station), conn)
     year_list=years.Year.tolist()
-    
+    year_list.insert(0, None)
     conn.close()
     write_logs("Years listed for given station")
     
@@ -201,10 +202,10 @@ def grab_days(station,years):
     
     conn=db_connection()
     cursor = conn.cursor()
-    days= pd.read_sql_query('SELECT distinct "day" FROM goes18_metadata where station="{}" and "year"={}'.format(station,years), conn)
+    days= pd.read_sql_query('SELECT distinct day FROM goes18_metadata where station="{}" and "year"="{}"'.format(station,years), conn)
     day_list = days.Day.tolist()
     day_list=[x.zfill(3) for x in day_list]
-
+    day_list.insert(0, None)
     conn.close()
     write_logs("Days listed for given year")
     return day_list
@@ -223,9 +224,10 @@ def grab_hours(station,years,days):
     
     conn=db_connection()
     cursor = conn.cursor()
-    hours= pd.read_sql_query('SELECT distinct "hour" FROM goes18_metadata where station="{}" and "year"={} and "day"={}'.format(station,years,days), conn)
+    hours= pd.read_sql_query('SELECT distinct hour FROM goes18_metadata where station="{}" and year="{}" and day="{}"'.format(station,years,days), conn)
     hour_list=hours.Hour.tolist()
     hour_list=[x.zfill(2) for x in hour_list]
+    hour_list.insert(0, None)
     conn.close()
     write_logs("Hours listed for given station,year,day")
     return hour_list
@@ -253,6 +255,7 @@ def grab_files(station,years,days,hours):
     for o in result.get('Contents'):
         file_names.append(o.get('Key').split('/')[4])
 
+    file_names.insert(0, None)
     write_logs("files retrieved for the given year, month, day and station from the S3 bucket")
     
     return file_names
@@ -310,7 +313,7 @@ def copy_files_s3(key,filename):
 
     client_id.copy_object(Bucket='damg7245-team7' , CopySource={"Bucket": 'noaa-goes18', "Key": key}, Key=filename)
     
-    url='https://damg7245-demo.s3.amazonaws.com/' + filename
+    url='https://damg7245-team7.s3.amazonaws.com/' + filename
     write_logs("URL created for Personal bucket")
     write_logs(url)
     
