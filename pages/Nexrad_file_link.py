@@ -1,6 +1,5 @@
 import requests
 import streamlit as st
-from backend import nexrad_file_retrieval_main
 import os
 from dotenv import load_dotenv
 import requests
@@ -11,7 +10,7 @@ load_dotenv()
 
 with st.sidebar:
     if st.button("Logout"):
-        webbrowser.open("http://localhost:8501/login")
+        webbrowser.open("http://streamlit:8501/login")
 
 
 
@@ -21,20 +20,20 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("Generate NOAA-NEXRAD URL By Filename")
 
-response = requests.get('http://localhost:8000/is_logged_in',headers=headers)
+response = requests.get('http://fastapi:8000/is_logged_in',headers=headers)
 
 if response.status_code == 200:
     file_name = st.text_input('Enter File Name')
     st.text("")
     if st.button('Get URL'):
         with st.spinner('Processing...'):
-            FASTAPI_URL='http://localhost:8000/user_api_status'
+            FASTAPI_URL='http://fastapi:8000/user_api_status'
             input={'api_name':'nexrad_filename'}
             response=requests.post(FASTAPI_URL,json=input,headers=headers)
             
             if response.status_code==200:
                 if file_name:
-                    FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
+                    FASTAPI_URL = "http://fastapi:8000/nexrad_get_download_link"
                     response = requests.post(FASTAPI_URL, json={"filename": file_name}, headers=headers)
                     if response .status_code == 200:
                         res = response.json()['Response']

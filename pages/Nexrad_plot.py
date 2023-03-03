@@ -12,19 +12,19 @@ load_dotenv()
 
 with st.sidebar:
     if st.button("Logout"):
-        webbrowser.open("http://localhost:8501/login")
+        webbrowser.open("http://streamlit:8501/login")
 
 
 ACCESS_TOKEN = os.environ["access_token"]
 headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("NEXRAD Station Locations")
-FASTAPI_URL='http://localhost:8000/user_api_status'
+FASTAPI_URL='http://fastapi:8000/user_api_status'
 input={'api_name':'goes_filename'}
 response=requests.post(FASTAPI_URL,json=input,headers=headers)
             
 if response.status_code==200:
-    response = requests.post('http://localhost:8000/retrieve_plot_data',headers=headers)
+    response = requests.post('http://fastapi:8000/retrieve_plot_data',headers=headers)
 
     if response.status_code == 200:
         df = pd.DataFrame(response.json()['df_dict'])

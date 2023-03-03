@@ -134,7 +134,8 @@ async def get_user_data(api_details: schema.api_detail_fetch,getCurrentUser: sch
     cursor.execute('SELECT * FROM user_activity WHERE username =? ORDER BY date DESC LIMIT 1',(getCurrentUser.username,))
     result = cursor.fetchone()
     username=getCurrentUser.username
-    api_limit=pd.read_sql_query('Select api_limit from Users where username="{}"'.format(username),db).api_limit.item()
+    api_limit=pd.read_sql_query('Select api_limit from Users where username="{}"'.format(username),db)
+
     date = datetime.utcnow()
     api_name=api_details.api_name 
     if not result:
