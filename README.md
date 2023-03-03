@@ -2,7 +2,7 @@
 
 **Codelab Link:** https://codelabs-preview.appspot.com/?file_id=1zG832dq7KBnSKgSkrVcLHVQBfarUR8ALQIqqGmswVhE#4
 
-**AWS Streamlit link:** http://54.88.51.70:8501
+**AWS Streamlit link:** http://54.88.51.70:8501/login
 
 
 
