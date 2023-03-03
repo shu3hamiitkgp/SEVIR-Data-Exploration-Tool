@@ -87,3 +87,10 @@ class User(BaseModel):
     password: str
     service_plan: str
     api_limit: int
+
+class fn_s3_fetch_keys(BaseModel):
+    bucket_name: str
+
+class fn_s3_download_file(BaseModel):
+    bucket_name: str
+    file_name: str
