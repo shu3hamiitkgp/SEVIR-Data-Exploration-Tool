@@ -177,3 +177,23 @@ async def signup(user_data: schema.User):
     db.commit()
     db.close()
     return {'status_code': '200'}    
+
+@app.get("/get_useract_data")
+async def useract_data(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join('data/',database_file_name)
+    db = sqlite3.connect(database_file_path)
+    try:
+        df=pd.read_sql_query('Select * from user_activity where username="{}"'.format(getCurrentUser.username),db)
+        df_json=df.to_dict(orient='records')
+        db.close()
+        return {'data':df_json}
+    except:
+        return {'data':'No data found'}
+
+@app.post("/get_current_username")
+async def get_username(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+    
+    # print(getCurrentUser)
+    
+    return {'username': getCurrentUser.username}
