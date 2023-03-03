@@ -35,7 +35,7 @@ if response.status_code == 200:
             if response.status_code==200:
                 if file_name:
                     FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
-                    response = requests.post(FASTAPI_URL, json={"filename": file_name})
+                    response = requests.post(FASTAPI_URL, json={"filename": file_name}, headers=headers)
                     if response .status_code == 200:
                         res = response.json()['Response']
                         st.text("")

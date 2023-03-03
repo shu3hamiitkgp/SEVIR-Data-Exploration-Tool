@@ -17,10 +17,8 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("Generate NOAA-GOES18 URL BY FILE")
 
-print(ACCESS_TOKEN)
 response = requests.get('http://localhost:8000/is_logged_in',headers=headers)
 
-print(response)
 
 if response.status_code == 200:
     file_name = st.text_input('Enter File Name')

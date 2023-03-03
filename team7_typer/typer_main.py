@@ -25,7 +25,7 @@ from api_codes import nexrad_api, s3_api
 from backend import nexrad_main
 
 
-database_path = os.path.join(project_dir, os.path.join('data', 'assignment_03.db'))
+database_path = os.path.join(project_dir, os.path.join('data', 'assignment_01.db'))
 app = typer.Typer()
 
 
@@ -240,7 +240,7 @@ def fetchnexrad(username: str, password: str):
     # station_selected = None
     # file_selected = None
     
-    FASTAPI_URL = "http://localhost:8081/nexrad_s3_fetch_month"
+    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_month"
     response = requests.get(FASTAPI_URL, json={"yearSelected": year})
 
     if response.status_code == 200:
@@ -252,7 +252,7 @@ def fetchnexrad(username: str, password: str):
             typer.echo("Invalid month")
             return
         
-    FASTAPI_URL = "http://localhost:8081/nexrad_s3_fetch_day"
+    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_day"
     response = requests.get(FASTAPI_URL, json={"year": str(year), "month": str(month_selected)})
 
     if response.status_code == 200:
@@ -264,7 +264,7 @@ def fetchnexrad(username: str, password: str):
             typer.echo("Invalid day")
             return
 
-    FASTAPI_URL = "http://localhost:8081/nexrad_s3_fetch_station"
+    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_station"
     response = requests.get(FASTAPI_URL, json={"year": year, "month": month_selected, "day": day_selected})
 
     if response.status_code == 200:
@@ -276,7 +276,7 @@ def fetchnexrad(username: str, password: str):
             typer.echo("Invalid station")
             return
                 
-    FASTAPI_URL = "http://localhost:8081/nexrad_s3_fetch_file"
+    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_file"
     response = requests.get(FASTAPI_URL, json={"year": year, "month": month_selected, "day": day_selected, "station": station_selected})
 
     if response.status_code == 200:
@@ -288,7 +288,7 @@ def fetchnexrad(username: str, password: str):
             typer.echo("Invalid file")
             return
 
-    FASTAPI_URL = "http://localhost:8081/nexrad_s3_fetchurl"
+    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetchurl"
     response = requests.post(FASTAPI_URL, json={"year": year, "month": month_selected, "day": day_selected, "station": station_selected, "file": file_selected})
 
     if response.status_code == 200:
@@ -456,7 +456,7 @@ def fetchnexrad_filename (username: str, password: str):
     
     
     file_name = typer.prompt("Enter file name")
-    FASTAPI_URL = "http://localhost:8081/nexrad_get_download_link"
+    FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
     response = requests.post(FASTAPI_URL, json={"filename": file_name})
 
     if response.status_code == 200:

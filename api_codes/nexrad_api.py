@@ -2,7 +2,7 @@ import ast
 import json
 import sqlite3
 import os
-from fastapi import FastAPI, Response, status
+from fastapi import Depends, FastAPI, Response, status, APIRouter
 import requests
 import sys
 import boto3
@@ -15,56 +15,23 @@ project_dir = os.path.abspath(os.path.join(cwd, '..'))
 sys.path.insert(0, project_dir)
 os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
 
-from backend import nexrad_main
+from backend import nexrad_main, oauth2
 from backend import nexrad_file_retrieval_main
 from pydantic import BaseModel
 import pandas as pd
 import re
+from backend import schema
 
 
 
-app = FastAPI()
+# app = FastAPI()
 
-class Nexrad_S3_fetch_month(BaseModel):
-    yearSelected: str
-
-class Nexrad_S3_fetch_day(BaseModel):
-    year: str
-    month: str
-
-class Nexrad_S3_fetch_station(BaseModel):
-    year: str
-    month: str
-    day: str
-
-class Nexrad_S3_fetch_file(BaseModel):
-    year: str
-    month: str
-    day: str
-    station: str
+router = APIRouter()
 
 
-class Nexrad_S3_fetch_url(BaseModel):
-    year: str
-    month: str
-    day: str
-    station: str
-    file:str
 
-class Nexard_S3_upload_file(BaseModel):
-    key: str
-    source_bucket: str
-    target_bucket: str
-
-class Nexrad_S3_generate_url(BaseModel):
-    target_bucket: str
-    user_key: str
-
-class Nexrad_fetch_filename(BaseModel):
-    filename: str
-
-@app.get('/nexrad_s3_fetch_db')
-async def nexrad_s3_fetch_db():
+@router.get('/nexrad_s3_fetch_db')
+async def nexrad_s3_fetch_db(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """Fetches the database from the S3 bucket
     
@@ -82,8 +49,8 @@ async def nexrad_s3_fetch_db():
 
 
 
-@app.get('/nexrad_s3_fetch_month')
-async def nexrad_s3_fetch_month(nexrad_s3_fetch_month: Nexrad_S3_fetch_month):
+@router.get('/nexrad_s3_fetch_month')
+async def nexrad_s3_fetch_month(nexrad_s3_fetch_month: schema.Nexrad_S3_fetch_month, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """Generates the list of months for the year chosen by the user
     
@@ -104,8 +71,8 @@ async def nexrad_s3_fetch_month(nexrad_s3_fetch_month: Nexrad_S3_fetch_month):
 
     return {"Month": nexrad_main.get_distinct_month(nexrad_s3_fetch_month.yearSelected)}
 
-@app.get('/nexrad_s3_fetch_day')
-async def nexrad_s3_fetch_day(nexrad_s3_fetch_day: Nexrad_S3_fetch_day):
+@router.get('/nexrad_s3_fetch_day')
+async def nexrad_s3_fetch_day(nexrad_s3_fetch_day: schema.Nexrad_S3_fetch_day, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     
     """Generates the list of days for the month chosen by the user
     
@@ -131,8 +98,8 @@ async def nexrad_s3_fetch_day(nexrad_s3_fetch_day: Nexrad_S3_fetch_day):
 
     return {"Day": nexrad_main.get_distinct_day(nexrad_s3_fetch_day.year, nexrad_s3_fetch_day.month)}
 
-@app.get('/nexrad_s3_fetch_station')
-async def nexrad_s3_fetch_station(nexrad_s3_fetch_station: Nexrad_S3_fetch_station):
+@router.get('/nexrad_s3_fetch_station')
+async def nexrad_s3_fetch_station(nexrad_s3_fetch_station: schema.Nexrad_S3_fetch_station, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     
     """Generates the list of stations for the day chosen by the user
     
@@ -158,8 +125,8 @@ async def nexrad_s3_fetch_station(nexrad_s3_fetch_station: Nexrad_S3_fetch_stati
 
 
 
-@app.get('/nexrad_s3_fetch_file')
-async def nexrad_s3_fetch_file(nexrad_s3_fetch_file: Nexrad_S3_fetch_file):
+@router.get('/nexrad_s3_fetch_file')
+async def nexrad_s3_fetch_file(nexrad_s3_fetch_file: schema.Nexrad_S3_fetch_file, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """Generates the list of files for the station chosen by the user
         
@@ -199,8 +166,8 @@ async def nexrad_s3_fetch_file(nexrad_s3_fetch_file: Nexrad_S3_fetch_file):
 
 
 
-@app.post('/nexrad_s3_fetchurl')
-async def nexrad_s3_fetchurl(nexrad_s3_fetch: Nexrad_S3_fetch_url):
+@router.post('/nexrad_s3_fetchurl')
+async def nexrad_s3_fetchurl(nexrad_s3_fetch: schema.Nexrad_S3_fetch_url, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """Generates the link for the file in the nexrad S3 bucket
     
@@ -238,8 +205,8 @@ async def nexrad_s3_fetchurl(nexrad_s3_fetch: Nexrad_S3_fetch_url):
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@app.get('/nexrad_s3_fetch_key')
-async def getKey(nexrad_s3_fetch: Nexrad_S3_fetch_url):
+@router.get('/nexrad_s3_fetch_key')
+async def getKey(nexrad_s3_fetch: schema.Nexrad_S3_fetch_url, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     """Generates the key for the file in the nexrad S3 bucket
     
     Args:
@@ -263,8 +230,8 @@ async def getKey(nexrad_s3_fetch: Nexrad_S3_fetch_url):
             nexrad_main.write_logs("Status: 200, Message: Key generated for the file " + nexrad_s3_fetch.file)
             return {'Key' : (o.get('Key'))}
 
-@app.post('/nexrad_s3_upload')
-async def uploadFiletoS3(nexrad_s3_upload: Nexard_S3_upload_file):
+@router.post('/nexrad_s3_upload')
+async def uploadFiletoS3(nexrad_s3_upload: schema.Nexard_S3_upload_file, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """Uploads the file to the S3 bucket
 
@@ -292,8 +259,8 @@ async def uploadFiletoS3(nexrad_s3_upload: Nexard_S3_upload_file):
     return {'Uploaded_Key': uploaded_key}
 
 
-@app.post('/nexrad_s3_generate_user_link')
-async def generateUserLink(nexrad_s3_generate_url: Nexrad_S3_generate_url):
+@router.post('/nexrad_s3_generate_user_link')
+async def generateUserLink(nexrad_s3_generate_url: schema.Nexrad_S3_generate_url, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     """Generates the user link in public s3 bucket
 
     Args:
@@ -310,8 +277,35 @@ async def generateUserLink(nexrad_s3_generate_url: Nexrad_S3_generate_url):
     print(url)
     return {'User S3 URL': url}
 
-@app.post('/nexrad_get_download_link')
-async def nexrad_download_link(nexrad_filename: Nexrad_fetch_filename):
+
+
+@router.post('/retrieve_plot_data')
+async def retrieve_plot_data(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join('data/',database_file_name)
+    db = sqlite3.connect(database_file_path)
+    df = pd.read_sql_query("SELECT * FROM nexrad_plot", db)
+    df_dict = df.to_dict(orient='records')
+    db.close()
+    return {'df_dict':df_dict, 'status_code': '200'}
+
+@router.post('/create_plot_table')
+async def create_plot_table(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join('data/',database_file_name)
+    db = sqlite3.connect(database_file_path)
+    cursor = db.cursor()
+    cursor.execute('''CREATE TABLE if not exists NEXRAD_PLOT (Id,State,City,ICAO_Location_Identifier,Coordinates,Lat,Lon)''')
+    df = pd.read_csv("data/Nexrad.csv")
+    df["Lon"] = -1 * df["Lon"]
+    df.to_sql('nexrad_plot', db, if_exists='append', index = False)
+    db.commit()
+    db.close()
+    return {'status_code': '200'}
+
+
+@router.post('/nexrad_get_download_link')
+async def nexrad_download_link(nexrad_filename: schema.Nexrad_fetch_filename, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """Generates the link for the file in the nexrad S3 bucket
     
