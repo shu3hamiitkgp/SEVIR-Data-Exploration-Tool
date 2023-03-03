@@ -105,6 +105,7 @@ async def create_default_user():
         cursor.execute("Insert into Users values (?,?,?,?)", ("user1",hashed_password,"Free",10))
         cursor.execute("Insert into Users values (?,?,?,?)", ("user2",hashed_password,"Gold",15))
         cursor.execute("Insert into Users values (?,?,?,?)", ("user3",hashed_password,"Platinum",20))
+        cursor.execute("Insert into Users values (?,?,?,?)", ("admin",hashed_password,"admin",1000))
         db.commit()
         db.close()
     return {'status_code': '200'}
@@ -197,3 +198,84 @@ async def get_username(getCurrentUser: schema.TokenData = Depends(oauth2.get_cur
     # print(getCurrentUser)
     
     return {'username': getCurrentUser.username}
+
+
+@app.get('/api_data')
+async def api_data():
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
+    db = sqlite3.connect(database_file_path)
+    cursor = db.cursor()
+    cursor.execute('''CREATE TABLE if not exists user_activity (username,service_plan,api_limit,date,api_name,hit_count)''')
+    df_user_activity = pd.read_sql_query("SELECT * FROM user_activity", db)
+    print(df_user_activity)
+    if len(df_user_activity) == 0:
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-01 12:11:07", '%Y-%m-%d %H:%M:%S.%f'),"goes_station",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-01 12:13:43", '%Y-%m-%d %H:%M:%S.%f'),"goes_years",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-01 12:14:31", '%Y-%m-%d %H:%M:%S.%f'),"goes_days",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-01 14:17:39", '%Y-%m-%d %H:%M:%S.%f'),"goes_hours",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-02 08:29:40", '%Y-%m-%d %H:%M:%S.%f'),"goes_files",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-02 08:29:49", '%Y-%m-%d %H:%M:%S.%f'),"goes_fetch_url",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-02 09:40:57", '%Y-%m-%d %H:%M:%S.%f'),"goes_AWS_url",1))
+        # cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user1","free",10,datetime.strptime("2023-02-03 00:18:33", '%Y-%m-%d %H:%M:%S.%f'),"validatefileUrl",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-03 22:55:21", '%Y-%m-%d %H:%M:%S.%f'),"getfileurl",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-03 21:32:06", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_db",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-03 09:47:54", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_month",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-03 09:38:58", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_day",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-03 02:37:35", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_station",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-04 18:22:25", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_file",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-04 21:37:21", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetchurl",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-04 05:10:35", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_key",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-02-04 13:39:14", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_upload",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-04 19:17:29", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_generate_user_link",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 06:21:05", '%Y-%m-%d %H:%M:%S.%f'),"create_plot_data",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 13:14:13", '%Y-%m-%d %H:%M:%S.%f'),"retrieve_plot_data",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 16:58:15", '%Y-%m-%d %H:%M:%S.%f'),"goes_station",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 15:29:04", '%Y-%m-%d %H:%M:%S.%f'),"goes_years",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 21:58:42", '%Y-%m-%d %H:%M:%S.%f'),"goes_days",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 01:32:26", '%Y-%m-%d %H:%M:%S.%f'),"goes_hours",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user2","gold",15,datetime.strptime("2023-03-05 15:18:50", '%Y-%m-%d %H:%M:%S.%f'),"goes_files",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 08:23:36", '%Y-%m-%d %H:%M:%S.%f'),"goes_fetch_url",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 05:57:25", '%Y-%m-%d %H:%M:%S.%f'),"goes_AWS_url",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 08:50:59", '%Y-%m-%d %H:%M:%S.%f'),"validatefileUrl",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 10:26:56", '%Y-%m-%d %H:%M:%S.%f'),"getfileUrl",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 01:50:16", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_db",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 16:44:30", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_month",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-08 01:44:56", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_day",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user3","platinum",20,datetime.strptime("2023-03-10 09:23:44", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_station",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 19:50:28", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_file",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 18:28:54", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetchurl",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 10:18:57", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_fetch_key",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 19:15:37", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_upload",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 10:19:20", '%Y-%m-%d %H:%M:%S.%f'),"nexrad_s3_generate_user_link",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 00:07:40", '%Y-%m-%d %H:%M:%S.%f'),"create_plot_data",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-10 21:30:33", '%Y-%m-%d %H:%M:%S.%f'),"retrieve_plot_data",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-11 06:34:14", '%Y-%m-%d %H:%M:%S.%f'),"retrieve_plot_data",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-11 03:25:59", '%Y-%m-%d %H:%M:%S.%f'),"goes_station",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-11 09:18:46", '%Y-%m-%d %H:%M:%S.%f'),"goes_years",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-11 08:36:55", '%Y-%m-%d %H:%M:%S.%f'),"goes_days",1))
+        cursor.execute("Insert into user_activity values (?,?,?,?,?,?)", ("user4","free",10,datetime.strptime("2023-03-11 08:32:01", '%Y-%m-%d %H:%M:%S.%f'),"goes_hours",1))
+    db.commit()
+    db.close()
+    print("Data Inserted Successfully")
+    return {'status_code': '200'}
+
+@app.get('/getAnalyticsData')
+async def get_analytics_data():
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
+    db = sqlite3.connect(database_file_path)
+    df = pd.read_sql_query("SELECT * FROM user_activity", db)
+    df_dict = df.to_dict(orient='records')
+    db.close()
+    return {'df_dict':df_dict, 'status_code': '200'}
+
+@app.get('/getUsersData')
+async def get_analytics_data():
+    database_file_name = "assignment_01.db"
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
+    db = sqlite3.connect(database_file_path)
+    df = pd.read_sql_query("SELECT * FROM Users", db)
+    df_dict = df.to_dict(orient='records')
+    db.close()
+    return {'df_dict':df_dict, 'status_code': '200'}

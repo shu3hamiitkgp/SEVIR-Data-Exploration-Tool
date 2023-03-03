@@ -10,9 +10,13 @@ ADD main.py requirements.txt /app/
 
 COPY backend /app/backend
 
+COPY database.db /app/
+
 COPY api_codes /app/api_codes
 
 COPY data /app/data
+
+COPY .env /app/
 
 RUN pip install -r requirements.txt
 

@@ -81,7 +81,7 @@ async def read_root(login_data: OAuth2PasswordRequestForm = Depends()):
             print("password verified")
             data = {'message': 'Username verified successfully', 'status_code': '200'}
             accessToken = access_token.create_access_token(data={"sub": str(user['username'][0])})
-            data = {'message': "Success",'access_token':accessToken,'status_code': '200'}
+            data = {'message': "Success",'access_token':accessToken,'service_plan': user['service_plan'][0],'status_code': '200'}
         else:
             data = {'message': 'Password is incorrect','status_code': '401'}
     # except Exception as e:

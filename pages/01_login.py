@@ -57,6 +57,8 @@ with st.container():
                     with open(".env", "w") as f:
                         f.writelines(lines)
                     st.success('Login Successful')
+                    if response.json()['service_plan']=='admin':
+                        webbrowser.open("http://localhost:8501/admin")
                     # show sidebar
                     st.markdown(block_sidebar_style, unsafe_allow_html=True)
 
