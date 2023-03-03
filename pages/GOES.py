@@ -26,7 +26,7 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 # db_path  = os.path.abspath(os.path.join(current_dir, "..", "Assignment_02"))
 
 # if 'database.db' not in os.listdir(os.getcwd()):
-#     FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_db"
+#     FASTAPI_URL = "http://fastapi:8000/nexrad_s3_fetch_db"
 #     response = requests.get(FASTAPI_URL, headers=headers)
 #     if response.status_code == 200:
 #         st.success("Successfully connected to the database")
@@ -35,7 +35,7 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 # st.title("Generate Link Nexrad")
 
-FASTAPI_url='http://localhost:8000/goes_station'
+FASTAPI_url='http://fastapi:8000/goes_station'
 response=requests.get(FASTAPI_url,headers=headers)
 station_box=None
 if response.status_code == 200:
@@ -49,7 +49,7 @@ else:
     
 
 if station_box!=None:
-    FASTAPI_url='http://localhost:8000/goes_years'
+    FASTAPI_url='http://fastapi:8000/goes_years'
     data={'station':station_box}
     response=requests.get(FASTAPI_url,json=data,headers=headers)
     year_box=None        
@@ -62,7 +62,7 @@ if station_box!=None:
         
             
     if year_box!=None:
-        FASTAPI_url='http://localhost:8000/goes_days'
+        FASTAPI_url='http://fastapi:8000/goes_days'
         data={'station':station_box,'year':year_box}
         response=requests.get(FASTAPI_url,json=data,headers=headers)
         day_box=None
@@ -75,7 +75,7 @@ if station_box!=None:
             
         
         if day_box!=None:
-            FASTAPI_url='http://localhost:8000/goes_hours'
+            FASTAPI_url='http://fastapi:8000/goes_hours'
             data={'station':station_box,'year':year_box, 'day':day_box}
             response=requests.get(FASTAPI_url,json=data,headers=headers)
             hour_box=None
@@ -88,7 +88,7 @@ if station_box!=None:
                 
             
             if hour_box!=None:
-                FASTAPI_url='http://localhost:8000/goes_files'
+                FASTAPI_url='http://fastapi:8000/goes_files'
                 data={'station':station_box,'year':year_box, 'day':day_box,'hour':hour_box}
                 response=requests.get(FASTAPI_url,json=data,headers=headers)
                 file_box=None
@@ -102,12 +102,12 @@ if station_box!=None:
 
                 if st.button('Submit'):
                     
-                    FASTAPI_url='http://localhost:8000/user_api_status'
+                    FASTAPI_url='http://fastapi:8000/user_api_status'
                     input={'api_name':'goes_feature'}
                     response=requests.post(FASTAPI_url,json=input,headers=headers)
                     if response.status_code==200:
                         with st.spinner('Generating Public S3 Link...'):
-                            FASTAPI_url='http://localhost:8000/goes_fetch_url'
+                            FASTAPI_url='http://fastapi:8000/goes_fetch_url'
                             input={'station':station_box,'year':year_box,'day':day_box,'hour':hour_box,'file':file_box}
                             response=requests.post(FASTAPI_url,json=input,headers=headers)
                             if response.status_code==200:
@@ -122,7 +122,7 @@ if station_box!=None:
                                  
                         
                         with st.spinner('Generating Custom Link...'):        
-                            FASTAPI_url='http://localhost:8000/goes_AWS_url'
+                            FASTAPI_url='http://fastapi:8000/goes_AWS_url'
                             input={'station':station_box,'year':year_box,'day':day_box,'hour':hour_box,'file':file_box}
                             response=requests.post(FASTAPI_url,json=input,headers=headers)
                             if response.status_code==200:

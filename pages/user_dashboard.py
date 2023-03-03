@@ -21,7 +21,7 @@ st.set_page_config(layout="wide")
 with open('pages/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-url="http://localhost:8000/get_current_username"
+url="http://fastapi:8000/get_current_username"
 response=requests.post(url,headers=headers)
 username=response.json()
 
@@ -98,7 +98,7 @@ def make_chart(data,x_axis,y_axis,type,title):
         y=y_axis)
 
 try:
-    fastapi_url="http://localhost:8000/get_useract_data"
+    fastapi_url="http://fastapi:8000/get_useract_data"
     response=requests.get(fastapi_url,headers=headers)
 except:
     print('user activity data not yet generated') 

@@ -16,7 +16,7 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("Generate NOAA-GOES18 URL BY FILE")
 
-response = requests.get('http://localhost:8000/is_logged_in',headers=headers)
+response = requests.get('http://fastapi:8000/is_logged_in',headers=headers)
 
 
 if response.status_code == 200:
@@ -24,19 +24,19 @@ if response.status_code == 200:
     st.text("")
     if st.button('Get URL'):
         with st.spinner('Processing...'):
-            FASTAPI_URL='http://localhost:8000/user_api_status'
+            FASTAPI_URL='http://fastapi:8000/user_api_status'
             input={'api_name':'goes_filename'}
             response=requests.post(FASTAPI_URL,json=input,headers=headers)
             
             if response.status_code==200:
                 
                 if file_name:
-                    response = requests.post('http://localhost:8000/validatefileUrl',json={'file_name': file_name},headers=headers)
+                    response = requests.post('http://fastapi:8000/validatefileUrl',json={'file_name': file_name},headers=headers)
                     if response.status_code != 401:
                         validate_res = response.json()['message']
                         st.text("")
                         if validate_res == 'Valid filename':
-                            response1 = requests.post('http://localhost:8000/getfileUrl',json={'file_name': file_name},headers=headers)
+                            response1 = requests.post('http://fastapi:8000/getfileUrl',json={'file_name': file_name},headers=headers)
                             if response1.status_code!= 401:
                                 get_res = response1.json()
                                 if get_res['status_code'] == '404':

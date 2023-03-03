@@ -46,7 +46,7 @@ with st.container():
                 "api_limit": api_limit
                 }
 
-                FASTAPI_URL = "http://localhost:8000/signup"
+                FASTAPI_URL = "http://fastapi:8000/signup"
                 response = requests.post(FASTAPI_URL,json=data)
                 if int(response.json()['status_code']) == 200:
                      st.success('User Registered Successfully')

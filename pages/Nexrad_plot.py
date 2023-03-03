@@ -11,7 +11,7 @@ import webbrowser
 load_dotenv()
 
 def create_plot_table():
-    response = requests.post('http://localhost:8000/create_plot_table')
+    response = requests.post('http://fastapi:8000/create_plot_table')
     return response
 
 with st.sidebar:
@@ -23,16 +23,16 @@ ACCESS_TOKEN = os.environ["access_token"]
 headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("NEXRAD Station Locations")
-FASTAPI_URL='http://localhost:8000/user_api_status'
+FASTAPI_URL='http://fastapi:8000/user_api_status'
 input={'api_name':'nexrad_plot'}
 response=requests.post(FASTAPI_URL,json=input,headers=headers)
             
 if response.status_code==200:
-    response = requests.post('http://localhost:8000/retrieve_plot_data',headers=headers)
+    response = requests.post('http://fastapi:8000/retrieve_plot_data',headers=headers)
 
         
 
-response = requests.post('http://localhost:8000/retrieve_plot_data',headers=headers)
+response = requests.post('http://fastapi:8000/retrieve_plot_data',headers=headers)
 
 if response.status_code == 200:
     df = pd.DataFrame(response.json()['df_dict'])

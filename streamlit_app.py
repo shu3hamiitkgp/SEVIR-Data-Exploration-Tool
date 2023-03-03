@@ -25,15 +25,15 @@ no_sidebar_style = """
 st.markdown(no_sidebar_style, unsafe_allow_html=True)
 
 def create_plot_table():
-    response = requests.post('http://localhost:8000/create_plot_table')
+    response = requests.post('http://fastapi:8000/create_plot_table')
     return response
 
 def api_data():
-    response = requests.get('http://localhost:8000/api_data')
+    response = requests.get('http://fastapi:8000/api_data')
     return response
 
 def create_default_user():
-    response = requests.post('http://localhost:8000/create_default_user')
+    response = requests.post('http://fastapi:8000/create_default_user')
     return response
 
 if __name__ == "__main__":

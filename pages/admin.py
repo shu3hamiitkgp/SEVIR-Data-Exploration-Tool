@@ -19,13 +19,13 @@ no_sidebar_style = """
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 st.markdown(no_sidebar_style, unsafe_allow_html=True)
 
-getAnalyticsData = requests.get('http://localhost:8000/getAnalyticsData')
+getAnalyticsData = requests.get('http://fastapi:8000/getAnalyticsData')
 print(getAnalyticsData)
 print(getAnalyticsData.json())
 print(getAnalyticsData.json()['df_dict'])
 df = pd.DataFrame(getAnalyticsData.json()['df_dict'])
 
-getUsersData = requests.get('http://localhost:8000/getUsersData')
+getUsersData = requests.get('http://fastapi:8000/getUsersData')
 df_user = pd.DataFrame(getUsersData.json()['df_dict'])
 
 print(df)

@@ -6,7 +6,7 @@ RUN pip install --upgrade pip
 
 WORKDIR /app
 
-ADD streamlit_app.py __init__.py image.png .env requirements.txt /app/
+ADD streamlit_app.py __init__.py style.css plans.jpg image.png .env requirements.txt /app/
 
 COPY pages /app/pages
 
