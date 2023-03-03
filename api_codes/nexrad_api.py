@@ -8,12 +8,12 @@ import sys
 import boto3
 import random
 import string
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+
 
 # Navigate to the project directory
-cwd = os.getcwd()
-project_dir = os.path.abspath(os.path.join(cwd, '..'))
-sys.path.insert(0, project_dir)
-os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
+
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 from backend import nexrad_main, oauth2
 from backend import nexrad_file_retrieval_main
@@ -282,23 +282,23 @@ async def generateUserLink(nexrad_s3_generate_url: schema.Nexrad_S3_generate_url
 @router.post('/retrieve_plot_data')
 async def retrieve_plot_data(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     database_file_name = "assignment_01.db"
-    database_file_path = os.path.join('data/',database_file_name)
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
     db = sqlite3.connect(database_file_path)
-    df = pd.read_sql_query("SELECT * FROM nexrad_plot", db)
+    df = pd.read_sql_query("SELECT * FROM nexrad_plot_new_table", db)
     df_dict = df.to_dict(orient='records')
     db.close()
     return {'df_dict':df_dict, 'status_code': '200'}
 
 @router.post('/create_plot_table')
-async def create_plot_table(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
+async def create_plot_table():
     database_file_name = "assignment_01.db"
-    database_file_path = os.path.join('data/',database_file_name)
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
     db = sqlite3.connect(database_file_path)
     cursor = db.cursor()
     cursor.execute('''CREATE TABLE if not exists NEXRAD_PLOT (Id,State,City,ICAO_Location_Identifier,Coordinates,Lat,Lon)''')
-    df = pd.read_csv("data/Nexrad.csv")
+    df = pd.read_csv(os.path.join(project_dir, "data/Nexrad.csv"))
     df["Lon"] = -1 * df["Lon"]
-    df.to_sql('nexrad_plot', db, if_exists='append', index = False)
+    df.to_sql('nexrad_plot_new_table', db, if_exists='append', index=False)
     db.commit()
     db.close()
     return {'status_code': '200'}

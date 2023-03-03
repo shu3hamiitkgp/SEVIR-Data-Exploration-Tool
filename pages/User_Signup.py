@@ -18,7 +18,7 @@ st.set_page_config(page_title="Signup", initial_sidebar_state="collapsed")
 st.markdown(no_sidebar_style, unsafe_allow_html=True)
 with st.sidebar:
     if st.button("Login"):
-        webbrowser.open("http://streamlit:8501/login")
+        webbrowser.open("http://localhost:8501/login")
 
 with st.container():
         username = st.text_input('Enter Username')
@@ -46,7 +46,7 @@ with st.container():
                 "api_limit": api_limit
                 }
 
-                FASTAPI_URL = "http://fastapi:8000/signup"
+                FASTAPI_URL = "http://localhost:8000/signup"
                 response = requests.post(FASTAPI_URL,json=data)
                 if int(response.json()['status_code']) == 200:
                      st.success('User Registered Successfully')
