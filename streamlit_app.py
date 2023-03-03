@@ -46,4 +46,4 @@ if __name__ == "__main__":
     st.image(image, caption='four humans working to fetch satelite data')
 
     if st.button('Fetch Data'):
-        webbrowser.open("http://streamlit:8501/login")
+        webbrowser.open("http://localhost:8501/login")
