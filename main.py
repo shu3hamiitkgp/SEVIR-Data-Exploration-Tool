@@ -165,6 +165,9 @@ async def signup(user_data: schema.User):
     database_file_name = "assignment_01.db"
     database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
     db = sqlite3.connect(database_file_path)
+    user = pd.read_sql_query('SELECT * FROM Users where username="{}"'.format(user_data.username), db)
+    if len(user) > 0:
+           return {'message': 'Username already exists','status_code': '409'}
     cursor = db.cursor()
     pwd_cxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_cxt.hash((user_data.password))
