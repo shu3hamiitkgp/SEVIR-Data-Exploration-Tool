@@ -181,7 +181,7 @@ async def signup(user_data: schema.User):
 @app.get("/get_useract_data")
 async def useract_data(getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     database_file_name = "assignment_01.db"
-    database_file_path = os.path.join('data/',database_file_name)
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
     db = sqlite3.connect(database_file_path)
     try:
         df=pd.read_sql_query('Select * from user_activity where username="{}"'.format(getCurrentUser.username),db)
