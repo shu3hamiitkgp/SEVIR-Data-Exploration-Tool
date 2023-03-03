@@ -127,28 +127,28 @@ async def login_update(getCurrentUser: schema.TokenData = Depends(oauth2.get_cur
 @app.post('/user_api_status')
 async def get_user_data(api_details: schema.api_detail_fetch,getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     database_file_name = "assignment_01.db"
-    database_file_path = os.path.join('data/',database_file_name)
-    db = sqlite3.connect(os.path.join(project_dir, database_file_path))
+    database_file_path = os.path.join(project_dir, os.path.join('data/',database_file_name))
+    db = sqlite3.connect(database_file_path)
     cursor = db.cursor()
-    cursor.execute('''CREATE TABLE if not exists user_activity (username, service_plan, api_limit,date,api_name,hit_count)''')
+    cursor.execute('''CREATE TABLE if not exists user_activity (username,service_plan,api_limit,date,api_name,hit_count)''')
     cursor.execute('SELECT * FROM user_activity WHERE username =? ORDER BY date DESC LIMIT 1',(getCurrentUser.username,))
     result = cursor.fetchone()
     username=getCurrentUser.username
-    api_limit=pd.read_sql_query('Select api_limit from Users where username="{}"'.format(username),db)
+    api_limit=pd.read_sql_query('Select api_limit from Users where username="{}"'.format(username),db).api_limit.item()
     date = datetime.utcnow()
-    service_plan=pd.read_sql_query('Select service_plan from Users where username="{}"'.format(username),db)
+    service_plan=pd.read_sql_query('Select service_plan from Users where username="{}"'.format(username),db).service_plan.item()
     api_name=api_details.api_name 
     if not result:
         hit_count = 1
-        cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?,?)', (username,service_plan, api_limit,date,api_name,hit_count))
+        cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?,?)', (username,service_plan,api_limit,date,api_name,hit_count))
         db.commit()
     else:
-        last_date = datetime.strptime(result[2], '%Y-%m-%d %H:%M:%S.%f')
+        last_date = datetime.strptime(result[3], '%Y-%m-%d %H:%M:%S.%f')
         time_diff = datetime.utcnow() - last_date
         if time_diff <= timedelta(hours=1):
-            if result[4]<api_limit:
-                hit_count = result[4] + 1
-                cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?,?)', (username,service_plan, api_limit,date,api_name,hit_count))
+            if result[5]<api_limit:
+                hit_count = result[5] + 1
+                cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?,?)', (username,service_plan,api_limit,date,api_name,hit_count))
                 db.commit()
             else:
                 db.commit()
@@ -156,7 +156,7 @@ async def get_user_data(api_details: schema.api_detail_fetch,getCurrentUser: sch
                 return Response(status_code=status.HTTP_429_TOO_MANY_REQUESTS)
         else:
             hit_count = 1
-            cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?,?)', (username,service_plan, api_limit,date,api_name,hit_count))
+            cursor.execute('INSERT INTO user_activity VALUES (?,?,?,?,?,?)', (username,service_plan,api_limit,date,api_name,hit_count))
             db.commit()
 
 
