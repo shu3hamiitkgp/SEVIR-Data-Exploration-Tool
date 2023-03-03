@@ -1,15 +1,6 @@
 version: '3'
 
 services:
-  streamlit:
-    volumes: 
-      - ./streamlit:/usr/src/app
-    build: 
-      context: ./
-      dockerfile: Dockerfile_streamlit
-    ports:
-      - "8501:8501"
-  
   fastapi:
     volumes: 
       - ./fastapi:/usr/src/app
@@ -18,3 +9,11 @@ services:
       dockerfile: Dockerfile_fastapi
     ports:
       - "8000:8000"
+  streamlit:
+    volumes: 
+      - ./streamlit:/usr/src/app
+    build: 
+      context: ./
+      dockerfile: Dockerfile_streamlit
+    ports:
+      - "8501:8501"

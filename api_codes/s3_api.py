@@ -1,9 +1,11 @@
 import os
 import sys
 import boto3
-from fastapi import FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from pydantic import BaseModel
 import botocore
+from backend import oauth2, schema
+
 
 cwd = os.getcwd()
 project_dir = os.path.abspath(os.path.join(cwd, '..'))
@@ -12,12 +14,7 @@ os.environ['PYTHONPATH'] = project_dir + ':' + os.environ.get('PYTHONPATH', '')
 
 from backend import nexrad_main
 
-class fn_s3_fetch_keys(BaseModel):
-    bucket_name: str
 
-class fn_s3_download_file(BaseModel):
-    bucket_name: str
-    file_name: str
 
 
 def create_connection():
@@ -37,10 +34,12 @@ def create_connection():
 
     return s3client
 
-app =FastAPI()
+# app =FastAPI()
 
-@app.get('/s3_fetch_keys')
-async def s3_fetch_keys(fn_s3_fetch_keys: fn_s3_fetch_keys):
+router = APIRouter()
+
+@router.get('/s3_fetch_keys')
+async def s3_fetch_keys(fn_s3_fetch_keys: schema.fn_s3_fetch_keys, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
     """
     This function fetches the keys from the S3 bucket based on the bucket name
 
@@ -65,8 +64,8 @@ async def s3_fetch_keys(fn_s3_fetch_keys: fn_s3_fetch_keys):
         return {"Error" : str(e)}
 
 
-@app.get('/download_s3_file')
-async def download_s3_file(fn_s3_download_file: fn_s3_download_file):
+@router.get('/download_s3_file')
+async def download_s3_file(fn_s3_download_file: schema.fn_s3_download_file, getCurrentUser: schema.TokenData = Depends(oauth2.get_current_user)):
 
     """
     This function downloads the file from the S3 bucket based on the file name and bucket name

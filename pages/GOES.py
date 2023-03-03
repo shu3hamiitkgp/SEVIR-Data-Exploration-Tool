@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import sys
 sys.path.append('../Assignment_02')
-from backend import main_goes18
 import requests
 import os
 from dotenv import load_dotenv
@@ -13,7 +12,7 @@ load_dotenv()
 
 with st.sidebar:
     if st.button("Logout"):
-        webbrowser.open("http://localhost:8501/login")
+        webbrowser.open("http://streamlit:8501/login")
 
 
 st.title('Generate GOES18 image URL')
@@ -26,13 +25,13 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 # # get the absolute path of the "assignment 2" folder
 # db_path  = os.path.abspath(os.path.join(current_dir, "..", "Assignment_02"))
 
-if 'database.db' not in os.listdir(os.getcwd()):
-    FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_db"
-    response = requests.get(FASTAPI_URL, headers=headers)
-    if response.status_code == 200:
-        st.success("Successfully connected to the database")
-    else:
-        st.error("Failed to connect to the database")
+# if 'database.db' not in os.listdir(os.getcwd()):
+#     FASTAPI_URL = "http://localhost:8000/nexrad_s3_fetch_db"
+#     response = requests.get(FASTAPI_URL, headers=headers)
+#     if response.status_code == 200:
+#         st.success("Successfully connected to the database")
+#     else:
+#         st.error("Failed to connect to the database")
 
 # st.title("Generate Link Nexrad")
 

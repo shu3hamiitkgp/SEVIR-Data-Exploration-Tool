@@ -47,5 +47,3 @@ if __name__ == "__main__":
 
     if st.button('Fetch Data'):
         webbrowser.open("http://localhost:8501/login")
-
-    

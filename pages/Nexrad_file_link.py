@@ -1,6 +1,5 @@
 import requests
 import streamlit as st
-from backend import nexrad_file_retrieval_main
 import os
 from dotenv import load_dotenv
 import requests
@@ -11,7 +10,7 @@ load_dotenv()
 
 with st.sidebar:
     if st.button("Logout"):
-        webbrowser.open("http://localhost:8501/login")
+        webbrowser.open("http://streamlit:8501/login")
 
 
 
@@ -35,7 +34,7 @@ if response.status_code == 200:
             if response.status_code==200:
                 if file_name:
                     FASTAPI_URL = "http://localhost:8000/nexrad_get_download_link"
-                    response = requests.post(FASTAPI_URL, json={"filename": file_name})
+                    response = requests.post(FASTAPI_URL, json={"filename": file_name}, headers=headers)
                     if response .status_code == 200:
                         res = response.json()['Response']
                         st.text("")

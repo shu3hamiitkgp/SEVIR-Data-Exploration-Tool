@@ -1,6 +1,5 @@
 import requests
 import streamlit as st
-from backend import goes_file_retrieval_main
 import os
 from dotenv import load_dotenv
 import webbrowser
@@ -9,7 +8,7 @@ load_dotenv()
 
 with st.sidebar:
     if st.button("Logout"):
-        webbrowser.open("http://localhost:8501/login")
+        webbrowser.open("http://streamlit:8501/login")
 
 
 ACCESS_TOKEN = os.environ["access_token"]
@@ -17,10 +16,8 @@ headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
 st.title("Generate NOAA-GOES18 URL BY FILE")
 
-print(ACCESS_TOKEN)
 response = requests.get('http://localhost:8000/is_logged_in',headers=headers)
 
-print(response)
 
 if response.status_code == 200:
     file_name = st.text_input('Enter File Name')

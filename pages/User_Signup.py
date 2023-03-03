@@ -49,6 +49,8 @@ with st.container():
                 FASTAPI_URL = "http://localhost:8000/signup"
                 response = requests.post(FASTAPI_URL,json=data)
                 if int(response.json()['status_code']) == 200:
-                     st.success('User Registered Successfully', icon="✅")
+                     st.success('User Registered Successfully')
+                elif int(response.json()['status_code']) == 409:
+                    st.error('Username already exists! Please use different username')
                 else:
                      st.error('Error Registering User! Please Try Again!')

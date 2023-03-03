@@ -74,6 +74,22 @@ class TokenClass(BaseModel):
 
 class TokenData(BaseModel):
     username: Union[str, None] = None
+<<<<<<< HEAD
+
+class User(BaseModel):
+    username: str
+    hashed_password: str
+    service_plan: str
+    api_limit: int
+
+class UserActivityData(BaseModel):
+    username: str
+    api_limit: str
+    date: str
+    api_name: int
+    request_status: str
+    hit_count: int
+=======
     
     
 class api_detail_fetch(BaseModel):
@@ -94,3 +110,4 @@ class fn_s3_fetch_keys(BaseModel):
 class fn_s3_download_file(BaseModel):
     bucket_name: str
     file_name: str
+>>>>>>> main

@@ -18,8 +18,10 @@ load_dotenv()
 #     level=LOGLEVEL,
 #     datefmt='%Y-%m-%d %H:%M:%S')
 
-database_file_path = 'database.db'
-# database_file_path = os.path.join('data/',database_file_name)
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+database_file_path = os.path.join(project_dir,  'database.db')
+
+
 
 clientlogs = boto3.client('logs',
 region_name= "us-east-1",
@@ -145,7 +147,8 @@ def db_connection():
         conn: connection to database
     """
     try:
-        conn = sqlite3.connect("database.db")
+        conn = sqlite3.connect(os.path.join(project_dir, 'database.db'))
+
         write_logs("Connected to db")    
     except Exception as e:
         print(e)
@@ -162,6 +165,7 @@ def grab_station():
     
     conn=db_connection()
     cursor = conn.cursor()
+    print("File path", database_file_path)
     stations= pd.read_sql_query('SELECT distinct station FROM goes18_metadata', conn)
     stations_list=stations.Station.tolist()
     stations_list.insert(0, None)
