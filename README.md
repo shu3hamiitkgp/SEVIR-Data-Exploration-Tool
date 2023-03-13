@@ -63,7 +63,16 @@ The UI was developed with the help of the python library of Streamlit framework.
 ## Steps to run the application - 
 
 - Clone repository 
-- Create .env file with AWS Bucket and Logging credentials
+- Create .env file with AWS Bucket and Logging credentials. Format to follow (access token automatically generates with login, but variable should be there) -
+```
+AWS_LOG_ACCESS_KEY= <enter your Log access Key>
+AWS_LOG_SECRET_KEY= <enter your Log secret Key>
+
+AWS_ACCESS_KEY1 = <enter your AWS access Key>
+AWS_SECRET_KEY1 = <enter your AWS secret Key>
+
+access_token=
+ ```
 - Execute the docker compose file (docker-compose.yml) with the command ‘docker compose up’
 
 #### Attestation
