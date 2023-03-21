@@ -25,6 +25,9 @@ The primary objective is to create a platform to provide data retrieval service 
 - Frontend UI - Streamlit 
 - Deployment - Docker + AWS EC2, Typer CLI
 
+## Architecture Diagram
+![alt text](project_2.png)
+
 ## Backend - FastAPI, Airflow, AWS Cloudwatch
 
 The backend is designed in a way that it facilitates API calls for communication between Frontend and the Backend. The RestAPIs developed with FASTAPI are restricted with JWTAuthentication through which a token is generated with an expiry of 30mins for every new user. The major operations are - 
