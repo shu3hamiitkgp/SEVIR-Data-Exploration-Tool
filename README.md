@@ -1,6 +1,6 @@
 # Assignment_03: Data as a Service
 
-> [Application Link](http://54.88.51.70:8501/login) <br>
+> [Application Link](http://54.88.51.70:8501) <br>
 > [Codelabs Documentation](https://codelabs-preview.appspot.com/?file_id=1zG832dq7KBnSKgSkrVcLHVQBfarUR8ALQIqqGmswVhE#4)<br>
 > [FastAPI Docs](http://54.88.51.70:8000/docs) <br>
 > Docker Images: [Backend](https://hub.docker.com/r/subhashchandran/assignment-03-fastapi),[Frontend](https://hub.docker.com/r/subhashchandran/assignment-03-streamlit) <br>
