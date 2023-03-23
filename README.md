@@ -1,4 +1,4 @@
-# Assignment_03: Data as a Service
+# Data as a Service: SEVIR Data Exploration Tool
 
 > [Application Link](http://54.88.51.70:8501) <br>
 > [Codelabs Documentation](https://codelabs-preview.appspot.com/?file_id=1zG832dq7KBnSKgSkrVcLHVQBfarUR8ALQIqqGmswVhE#4)<br>
@@ -9,7 +9,9 @@
 
 ## Objective 
 
-The primary objective is to create a platform to provide data retrieval service for satellite images in NOAA’s GOES18 and Nexrad AWS S3 buckets. A user can either provide input for image-related attributes or directly provide a filename to generate a link to the file.
+The Storm EVent ImagRy (SEVIR) dataset is a collection of geographically and chronologically aligned images that include meteorological events that were photographed by radar and satellite.
+
+The primary objective is to create a platform to provide data retrieval service for satellite images in NOAA’s GOES18 (Geostationary satellite) and Nexrad weather radar data AWS S3 buckets. A user can either provide input for image-related attributes or directly provide a filename to generate a link to the file.
 
 **Note:** The data is scrapped from publicly accessible data in NOAA’s S3 buckets - [GOES18](https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L1b-RadC/) & [NEXRAD](https://noaa-nexrad-level2.s3.amazonaws.com/index.html) which is refreshed daily with Airflow DAGs
 
