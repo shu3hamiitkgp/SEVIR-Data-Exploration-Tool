@@ -11,13 +11,15 @@
 
 The primary objective is to create a platform to provide data retrieval service for satellite images in NOAA’s GOES18 and Nexrad AWS S3 buckets. A user can either provide input for image-related attributes or directly provide a filename to generate a link to the file.
 
+**Note:** The data is scrapped from publicly accessible data in NOAA’s S3 buckets - [GOES18](https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L1b-RadC/) & [NEXRAD](https://noaa-nexrad-level2.s3.amazonaws.com/index.html) which is refreshed daily with Airflow DAGs
+
+![sevir_sample](https://user-images.githubusercontent.com/114712818/218191862-49f8f32b-bc77-4e03-ae81-9ebac16b514a.gif)
+
 ## Usecase
 
 - A user can fetch the data either by providing date and station features or by providing a valid file name
 - A downloadable link to the file is provided for both NOAA’s and Private buckets
 - A plot for all NEXRAD stations across the US
-
-**Note:** The data is scrapped from publicly accessible data in NOAA’s S3 buckets and is refreshed daily with Airflow DAGs
 
 ## Tech Components
 
